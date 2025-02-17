@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://clothing-ecommerc-store.onrender.com",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
