@@ -15,8 +15,6 @@ const shopReviewRouter = require("./routes/shop/review-routes");
 
 const commonFeatureRouter = require("./routes/common/feature-routes");
 
-//create a database connection -> u can also
-//create a separate file for this and then import/use that file here
 
 mongoose
   .connect("mongodb+srv://kishore:KishSabi%402268@anivarti.cp7lj.mongodb.net/clothing-store")
