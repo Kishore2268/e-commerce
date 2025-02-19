@@ -62,10 +62,11 @@ app.use("/api/common/feature", commonFeatureRouter);
 // Serve static files from Vite build
 app.use(express.static(path.join(__dirname, "dist")));
 
-// Redirect all other routes to index.html (React will handle routing)
+// Handle client-side routing properly
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
+
 
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
