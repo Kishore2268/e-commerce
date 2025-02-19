@@ -105,18 +105,18 @@ function UserCartItemsContent({ cartItem }) {
       </div>
     </div>
     <div className="flex flex-col items-end">
+    <p className="font-semibold">
+        Color: {cartItem?.color}
+      </p>
+      <p className="font-semibold">
+        Size: {cartItem?.size}
+      </p>
       <p className="font-semibold">
         $
         {(
           (cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price) *
           cartItem?.quantity
         ).toFixed(2)}
-      </p>
-      <p className="font-semibold">
-        Color: {cartItem?.color}
-      </p>
-      <p className="font-semibold">
-        Size: {cartItem?.size}
       </p>
       <Trash
         onClick={() => handleCartItemDelete(cartItem)}

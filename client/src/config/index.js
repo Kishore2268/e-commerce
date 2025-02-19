@@ -86,6 +86,23 @@ export const addProductFormElements = [
     placeholder: "Enter product price",
   },
   {
+    label: "Colors",
+    name: "colors",
+    componentType: "select",
+    options: [],
+  },
+  {
+    label: "Include Sizes?",
+    name: "includeSizes",
+    componentType: "checkbox",
+  },
+  {
+    label: "Sizes",
+    name: "sizes",
+    componentType: "input",
+    placeholder: "Enter sizes with stock (e.g., xs:10, s:5)",
+  },
+  {
     label: "Sale Price",
     name: "salePrice",
     componentType: "input",
@@ -98,21 +115,8 @@ export const addProductFormElements = [
     componentType: "input",
     type: "number",
     placeholder: "Enter total stock",
-  },
-  {
-    label: "Colors",
-    name: "colors",
-    componentType: "input",
-    type: "text",
-    placeholder: "Enter product colors (comma separated)",
-  },
-  {
-    label: "Sizes",
-    name: "sizes",
-    componentType: "input",
-    type: "text",
-    placeholder: "Enter sizes with stock (e.g., xs:10, s:5)",
-  },
+  }
+  
 ];
 
 export const shoppingViewHeaderMenuItems = [
@@ -204,8 +208,34 @@ export const filterOptions = {
     { id: "red", label: "Red" },
     { id: "blue", label: "Blue" },
     { id: "green", label: "Green" },
-    // Add more colors as needed
-  ],
+    { id: "yellow", label: "Yellow" },
+    { id: "black", label: "Black" },
+    { id: "white", label: "White" },
+    { id: "orange", label: "Orange" },
+    { id: "purple", label: "Purple" },
+    { id: "pink", label: "Pink" },
+    { id: "brown", label: "Brown" },
+    { id: "gray", label: "Gray" },
+    { id: "cyan", label: "Cyan" },
+    { id: "magenta", label: "Magenta" },
+    { id: "lime", label: "Lime" },
+    { id: "teal", label: "Teal" },
+    { id: "indigo", label: "Indigo" },
+    { id: "violet", label: "Violet" },
+    { id: "gold", label: "Gold" },
+    { id: "silver", label: "Silver" },
+    { id: "maroon", label: "Maroon" },
+    { id: "navy", label: "Navy" },
+    { id: "olive", label: "Olive" },
+    { id: "beige", label: "Beige" },
+    { id: "turquoise", label: "Turquoise" },
+    { id: "peach", label: "Peach" },
+    { id: "lavender", label: "Lavender" },
+    { id: "charcoal", label: "Charcoal" },
+    { id: "coral", label: "Coral" },
+    { id: "salmon", label: "Salmon" },
+    { id: "khaki", label: "Khaki" },
+]
 };
 
 export const sortOptions = [
