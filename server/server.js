@@ -26,13 +26,6 @@ const path = require("path");
 
 const PORT = process.env.PORT || 5000;
 
-// Serve static files from Vite build
-app.use(express.static(path.join(__dirname, "dist")));
-
-// Redirect all other routes to index.html (React will handle routing)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
 
 app.use(
   cors({
@@ -51,6 +44,15 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+
+// Serve static files from Vite build
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Redirect all other routes to index.html (React will handle routing)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
