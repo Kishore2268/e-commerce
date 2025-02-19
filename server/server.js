@@ -36,7 +36,7 @@ app.get("*", (req, res) => {
 
 app.use(
   cors({
-    origin: "https://clothing-ecommerc-store.onrender.com",
+    origin: ["https://clothing-ecommerc-store.onrender.com", "http://localhost:3000"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
