@@ -45,13 +45,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-// Serve static files from Vite build
-app.use(express.static(path.join(__dirname, "dist")));
-
-// Redirect all other routes to index.html (React will handle routing)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
 
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
@@ -65,5 +58,14 @@ app.use("/api/shop/search", shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
 
 app.use("/api/common/feature", commonFeatureRouter);
+
+// Serve static files from Vite build
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Redirect all other routes to index.html (React will handle routing)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
