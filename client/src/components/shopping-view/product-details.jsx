@@ -16,6 +16,8 @@ import PropTypes from "prop-types";
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -202,7 +204,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                   handleRatingChange={handleRatingChange}
                 />
               </div>
-              <Input
+              <Input 
                 name="reviewMsg"
                 value={reviewMsg}
                 onChange={(event) => setReviewMsg(event.target.value)}
@@ -215,6 +217,20 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 Submit
               </Button>
             </div>
+          </div>
+          <div>
+            <h3>Select Color</h3>
+            {productDetails?.colors.map((color) => (
+              <Button key={color} onClick={() => setSelectedColor(color)}>
+                {color}
+              </Button>
+            ))}
+            <h3>Select Size</h3>
+            {productDetails?.sizes.map((sizeObj) => (
+              <Button key={sizeObj.size} onClick={() => setSelectedSize(sizeObj.size)}>
+                {sizeObj.size}
+              </Button>
+            ))}
           </div>
         </div>
       </DialogContent>
@@ -233,6 +249,8 @@ ProductDetailsDialog.propTypes = {
     price: PropTypes.number,
     salePrice: PropTypes.number,
     totalStock: PropTypes.number,
+    colors: PropTypes.array,
+    sizes: PropTypes.array,
   }),
 };
 

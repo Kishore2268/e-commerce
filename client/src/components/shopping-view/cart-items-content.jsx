@@ -112,6 +112,12 @@ function UserCartItemsContent({ cartItem }) {
           cartItem?.quantity
         ).toFixed(2)}
       </p>
+      <p className="font-semibold">
+        Color: {cartItem?.color}
+      </p>
+      <p className="font-semibold">
+        Size: {cartItem?.size}
+      </p>
       <Trash
         onClick={() => handleCartItemDelete(cartItem)}
         className="cursor-pointer mt-1"
@@ -128,6 +134,8 @@ cartItem: PropTypes.shape({
   image: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   price: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired,
+  size: PropTypes.string.isRequired,
   salePrice: PropTypes.number,
   quantity: PropTypes.number.isRequired,
   productId: PropTypes.string.isRequired,

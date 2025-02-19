@@ -60,6 +60,8 @@ function ShoppingOrderDetailsView({ orderDetails }) {
                       <span>Title: {item.title}</span>
                       <span>Quantity: {item.quantity}</span>
                       <span>Price: ${item.price}</span>
+                      <span>Color: {item.color}</span>
+                      <span>Size: {item.size}</span>
                     </li>
                   ))
                 : null}
@@ -99,6 +101,8 @@ ShoppingOrderDetailsView.propTypes = {
         title: PropTypes.string.isRequired,
         quantity: PropTypes.number.isRequired,
         price: PropTypes.number.isRequired,
+        color: PropTypes.string,
+        size: PropTypes.string,
       })
     ),
     addressInfo: PropTypes.shape({

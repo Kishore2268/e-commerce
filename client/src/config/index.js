@@ -99,6 +99,20 @@ export const addProductFormElements = [
     type: "number",
     placeholder: "Enter total stock",
   },
+  {
+    label: "Colors",
+    name: "colors",
+    componentType: "input",
+    type: "text",
+    placeholder: "Enter product colors (comma separated)",
+  },
+  {
+    label: "Sizes",
+    name: "sizes",
+    componentType: "input",
+    type: "text",
+    placeholder: "Enter sizes with stock (e.g., xs:10, s:5)",
+  },
 ];
 
 export const shoppingViewHeaderMenuItems = [
@@ -176,6 +190,21 @@ export const filterOptions = {
     { id: "levi", label: "Levi's" },
     { id: "zara", label: "Zara" },
     { id: "h&m", label: "H&M" },
+  ],
+  size: [
+    { id: "xs", label: "XS" },
+    { id: "s", label: "S" },
+    { id: "m", label: "M" },
+    { id: "l", label: "L" },
+    { id: "xl", label: "XL" },
+    { id: "2xl", label: "2XL" },
+    { id: "3xl", label: "3XL" },
+  ],
+  color: [
+    { id: "red", label: "Red" },
+    { id: "blue", label: "Blue" },
+    { id: "green", label: "Green" },
+    // Add more colors as needed
   ],
 };
 
