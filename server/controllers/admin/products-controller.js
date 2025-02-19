@@ -15,7 +15,7 @@ const handleImageUpload = async (req, res) => {
     console.log(error);
     res.json({
       success: false,
-      message: "Error occurred",
+      message: "Error occured",
     });
   }
 };
@@ -30,22 +30,10 @@ const addProduct = async (req, res) => {
       category,
       brand,
       price,
-      colors,
-      sizes,
       salePrice,
       totalStock,
-      averageReview
-      
+      averageReview,
     } = req.body;
-
-    // Validate total stock against sizes' stock
-    const totalSizeStock = sizes.reduce((sum, sizeObj) => sum + sizeObj.stock, 0);
-    if (totalStock < totalSizeStock) {
-      return res.status(400).json({
-        success: false,
-        message: "Total stock cannot be less than the sum of all sizes' stock.",
-      });
-    }
 
     console.log(averageReview, "averageReview");
 
@@ -56,11 +44,9 @@ const addProduct = async (req, res) => {
       category,
       brand,
       price,
-      colors,
-      sizes,
       salePrice,
       totalStock,
-      averageReview
+      averageReview,
     });
 
     await newlyCreatedProduct.save();
@@ -72,7 +58,7 @@ const addProduct = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occurred",
+      message: "Error occured",
     });
   }
 };
@@ -90,7 +76,7 @@ const fetchAllProducts = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occurred",
+      message: "Error occured",
     });
   }
 };
@@ -106,11 +92,9 @@ const editProduct = async (req, res) => {
       category,
       brand,
       price,
-      colors,
-      sizes,
       salePrice,
       totalStock,
-      averageReview
+      averageReview,
     } = req.body;
 
     let findProduct = await Product.findById(id);
@@ -120,22 +104,11 @@ const editProduct = async (req, res) => {
         message: "Product not found",
       });
 
-    // Validate total stock against sizes' stock
-    const totalSizeStock = sizes.reduce((sum, sizeObj) => sum + sizeObj.stock, 0);
-    if (totalStock < totalSizeStock) {
-      return res.status(400).json({
-        success: false,
-        message: "Total stock cannot be less than the sum of all sizes' stock.",
-      });
-    }
-
     findProduct.title = title || findProduct.title;
     findProduct.description = description || findProduct.description;
     findProduct.category = category || findProduct.category;
     findProduct.brand = brand || findProduct.brand;
     findProduct.price = price === "" ? 0 : price || findProduct.price;
-    findProduct.colors = colors || findProduct.colors;
-    findProduct.sizes = sizes || findProduct.sizes;
     findProduct.salePrice =
       salePrice === "" ? 0 : salePrice || findProduct.salePrice;
     findProduct.totalStock = totalStock || findProduct.totalStock;
@@ -151,7 +124,7 @@ const editProduct = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occurred",
+      message: "Error occured",
     });
   }
 };
@@ -170,13 +143,13 @@ const deleteProduct = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Product deleted successfully",
+      message: "Product delete successfully",
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occurred",
+      message: "Error occured",
     });
   }
 };

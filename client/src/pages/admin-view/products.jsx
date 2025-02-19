@@ -29,8 +29,6 @@ const initialFormData = {
   salePrice: "",
   totalStock: "",
   averageReview: 0,
-  colors: [],
-  sizes: [],
 };
 
 function AdminProducts() {
@@ -49,12 +47,11 @@ function AdminProducts() {
   function onSubmit(event) {
     event.preventDefault();
 
-    const { colors, sizes } = formData;
     currentEditedId !== null
       ? dispatch(
           editProduct({
             id: currentEditedId,
-            formData: { ...formData, colors, sizes },
+            formData,
           })
         ).then((data) => {
           console.log(data, "edit");
@@ -70,8 +67,6 @@ function AdminProducts() {
           addNewProduct({
             ...formData,
             image: uploadedImageUrl,
-            colors,
-            sizes,
           })
         ).then((data) => {
           if (data?.payload?.success) {

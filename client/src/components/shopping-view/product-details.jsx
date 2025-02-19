@@ -12,13 +12,10 @@ import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import PropTypes from "prop-types";
-import { Select } from "../ui/select";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
-  const [selectedColor, setSelectedColor] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -148,35 +145,25 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               ({averageReview.toFixed(2)})
             </span>
           </div>
-          <div className="flex gap-4 mt-5 mb-5">
-            <Select
-              label="Select Color"
-              options={productDetails?.colors.map(color => ({ value: color, label: color }))}
-              onChange={setSelectedColor}
-            />
-            <Select
-              label="Select Size"
-              options={productDetails?.sizes.map(sizeObj => ({ value: sizeObj.size, label: sizeObj.size }))}
-              onChange={setSelectedSize}
-            />
+          <div className="mt-5 mb-5">
+            {productDetails?.totalStock === 0 ? (
+              <Button className="w-full opacity-60 cursor-not-allowed">
+                Out of Stock
+              </Button>
+            ) : (
+              <Button
+                className="w-full"
+                onClick={() =>
+                  handleAddToCart(
+                    productDetails?._id,
+                    productDetails?.totalStock
+                  )
+                }
+              >
+                Add to Cart
+              </Button>
+            )}
           </div>
-          {productDetails?.totalStock === 0 ? (
-            <Button className="w-full opacity-60 cursor-not-allowed">
-              Out of Stock
-            </Button>
-          ) : (
-            <Button
-              className="w-full"
-              onClick={() =>
-                handleAddToCart(
-                  productDetails?._id,
-                  productDetails?.totalStock
-                )
-              }
-            >
-              Add to Cart
-            </Button>
-          )}
           <Separator />
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
@@ -246,8 +233,6 @@ ProductDetailsDialog.propTypes = {
     price: PropTypes.number,
     salePrice: PropTypes.number,
     totalStock: PropTypes.number,
-    colors: PropTypes.array,
-    sizes: PropTypes.array,
   }),
 };
 

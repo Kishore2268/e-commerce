@@ -2,7 +2,7 @@ const Product = require("../../models/Product");
 
 const getFilteredProducts = async (req, res) => {
   try {
-    const { category = [], brand = [], color = [], size = [], sortBy = "price-lowtohigh" } = req.query;
+    const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;
 
     let filters = {};
 
@@ -12,14 +12,6 @@ const getFilteredProducts = async (req, res) => {
 
     if (brand.length) {
       filters.brand = { $in: brand.split(",") };
-    }
-
-    if (color.length) {
-      filters.colors = { $in: color.split(",") };
-    }
-
-    if (size.length) {
-      filters.sizes = { $elemMatch: { size: { $in: size.split(",") } } };
     }
 
     let sort = {};
@@ -55,10 +47,10 @@ const getFilteredProducts = async (req, res) => {
       data: products,
     });
   } catch (e) {
-    console.log(e);
+    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Some error occurred",
+      message: "Some error occured",
     });
   }
 };
@@ -79,111 +71,12 @@ const getProductDetails = async (req, res) => {
       data: product,
     });
   } catch (e) {
-    console.log(e);
+    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Some error occurred",
+      message: "Some error occured",
     });
   }
 };
 
-const addProduct = async (req, res) => {
-  try {
-    const {
-      image,
-      title,
-      description,
-      category,
-      brand,
-      price,
-      colors,
-      sizes,
-      salePrice,
-      totalStock,
-      averageReview
-    } = req.body;
-
-    const newlyCreatedProduct = new Product({
-      image,
-      title,
-      description,
-      category,
-      brand,
-      price,
-      colors,
-      sizes,
-      salePrice,
-      totalStock,
-      averageReview
-    });
-
-    await newlyCreatedProduct.save();
-    res.status(201).json({
-      success: true,
-      data: newlyCreatedProduct,
-    });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({
-      success: false,
-      message: "Error occurred",
-    });
-  }
-};
-
-const editProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      image,
-      title,
-      description,
-      category,
-      brand,
-      price,
-      colors,
-      sizes,
-      salePrice,
-      totalStock,
-      averageReview
-    } = req.body;
-
-    let findProduct = await Product.findById(id);
-    if (!findProduct)
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-
-    findProduct.title = title || findProduct.title;
-    findProduct.description = description || findProduct.description;
-    findProduct.category = category || findProduct.category;
-    findProduct.brand = brand || findProduct.brand;
-    findProduct.price = price === "" ? 0 : price || findProduct.price;
-    findProduct.colors = colors || findProduct.colors;
-    findProduct.sizes = sizes || findProduct.sizes;
-    findProduct.salePrice = salePrice === "" ? 0 : salePrice || findProduct.salePrice;
-    findProduct.totalStock = totalStock || findProduct.totalStock;
-    findProduct.image = image || findProduct.image;
-    findProduct.averageReview = averageReview || findProduct.averageReview;
-
-    await findProduct.save();
-    res.status(200).json({
-      success: true,
-      data: findProduct,
-    });
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({
-      success: false,
-      message: "Error occurred",
-    });
-  }
-};
-
-module.exports = {
-  getFilteredProducts,
-  getProductDetails,
-  addProduct,
-  editProduct,
-};
+module.exports = { getFilteredProducts, getProductDetails };

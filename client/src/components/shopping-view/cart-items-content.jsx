@@ -105,12 +105,6 @@ function UserCartItemsContent({ cartItem }) {
       </div>
     </div>
     <div className="flex flex-col items-end">
-    <p className="font-semibold">
-        Color: {cartItem?.color}
-      </p>
-      <p className="font-semibold">
-        Size: {cartItem?.size}
-      </p>
       <p className="font-semibold">
         $
         {(
@@ -134,8 +128,6 @@ cartItem: PropTypes.shape({
   image: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   price: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-  size: PropTypes.string.isRequired,
   salePrice: PropTypes.number,
   quantity: PropTypes.number.isRequired,
   productId: PropTypes.string.isRequired,
