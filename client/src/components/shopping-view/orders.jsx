@@ -40,7 +40,7 @@ function ShoppingOrders() {
   console.log(orderDetails, "orderDetails");
 
   return (
-    <Card>
+    <Card className="max-w-8xl">
       <CardHeader>
         <CardTitle>Order History</CardTitle>
       </CardHeader>

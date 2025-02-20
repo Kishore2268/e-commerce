@@ -39,6 +39,21 @@ export const loginFormControls = [
   },
 ];
 
+export const clothingSizes = [
+  { id: "xs", label: "XS" },
+  { id: "s", label: "S" },
+  { id: "m", label: "M" },
+  { id: "l", label: "L" },
+  { id: "xl", label: "XL" },
+  { id: "2xl", label: "2XL" },
+  { id: "3xl", label: "3XL" },
+];
+
+export const footwearSizes = Array.from({ length: 14 }, (_, i) => ({
+  id: `uk-${i + 1}`,
+  label: `UK ${i + 1}`,
+}));
+
 export const addProductFormElements = [
   {
     label: "Title",
@@ -58,12 +73,33 @@ export const addProductFormElements = [
     name: "category",
     componentType: "select",
     options: [
-      { id: "men", label: "Men" },
-      { id: "women", label: "Women" },
-      { id: "kids", label: "Kids" },
-      { id: "accessories", label: "Accessories" },
+      { id: "clothing", label: "Clothing" },
       { id: "footwear", label: "Footwear" },
+      { id: "accessories", label: "Accessories" },
     ],
+  },
+  {
+    label: "Sub Category",
+    name: "subCategory",
+    componentType: "select",
+    dependsOn: "category",
+    options: {
+      clothing: [
+        { id: "men's clothing", label: "Men's Clothing" },
+        { id: "women's clothing", label: "Women's Clothing" },
+        { id: "kids' clothing", label: "Kids' Clothing" },
+      ],
+      footwear: [
+        { id: "men's footwear", label: "Men's Footwear" },
+        { id: "women's footwear", label: "Women's Footwear" },
+        { id: "kids' footwear", label: "Kids' Footwear" },
+      ],
+      accessories: [
+        { id: "men's accessories", label: "Men's Accessories" },
+        { id: "women's accessories", label: "Women's Accessories" },
+        { id: "kids' accessories", label: "Kids' Accessories" },
+      ],
+    },
   },
   {
     label: "Brand",
@@ -92,13 +128,6 @@ export const addProductFormElements = [
     type: "number",
     placeholder: "Enter sale price (optional)",
   },
-  {
-    label: "Total Stock",
-    name: "totalStock",
-    componentType: "input",
-    type: "number",
-    placeholder: "Enter total stock",
-  },
 ];
 
 export const shoppingViewHeaderMenuItems = [
@@ -109,22 +138,12 @@ export const shoppingViewHeaderMenuItems = [
   },
   {
     id: "products",
-    label: "Products",
+    label: "All Products",
     path: "/shop/listing",
   },
   {
-    id: "men",
-    label: "Men",
-    path: "/shop/listing",
-  },
-  {
-    id: "women",
-    label: "Women",
-    path: "/shop/listing",
-  },
-  {
-    id: "kids",
-    label: "Kids",
+    id: "clothing",
+    label: "Clothing",
     path: "/shop/listing",
   },
   {
@@ -161,14 +180,49 @@ export const brandOptionsMap = {
   "h&m": "H&M",
 };
 
+export const colors = [
+  { id: "black", label: "Black" },
+  { id: "white", label: "White" },
+  { id: "red", label: "Red" },
+  { id: "blue", label: "Blue" },
+  { id: "green", label: "Green" },
+  { id: "yellow", label: "Yellow" },
+  { id: "pink", label: "Pink" },
+  { id: "purple", label: "Purple" },
+  { id: "orange", label: "Orange" },
+  { id: "grey", label: "Grey" },
+  { id: "brown", label: "Brown" },
+  { id: "navy", label: "Navy" },
+];
+
 export const filterOptions = {
   category: [
-    { id: "men", label: "Men" },
-    { id: "women", label: "Women" },
-    { id: "kids", label: "Kids" },
-    { id: "accessories", label: "Accessories" },
+    { id: "clothing", label: "Clothing" },
     { id: "footwear", label: "Footwear" },
+    { id: "accessories", label: "Accessories" },
   ],
+  subCategory: {
+    clothing: [
+      { id: "men's clothing", label: "Men's Clothing" },
+      { id: "women's clothing", label: "Women's Clothing" },
+      { id: "kids' clothing", label: "Kids' Clothing" },
+    ],
+    footwear: [
+      { id: "men's footwear", label: "Men's Footwear" },
+      { id: "women's footwear", label: "Women's Footwear" },
+      { id: "kids' footwear", label: "Kids' Footwear" },
+    ],
+    accessories: [
+      { id: "men's accessories", label: "Men's Accessories" },
+      { id: "women's accessories", label: "Women's Accessories" },
+      { id: "kids' accessories", label: "Kids' Accessories" },
+    ],
+  },
+  size: {
+    clothing: clothingSizes,
+    footwear: footwearSizes,
+  },
+  color: colors,
   brand: [
     { id: "nike", label: "Nike" },
     { id: "adidas", label: "Adidas" },

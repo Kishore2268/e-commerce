@@ -79,7 +79,7 @@ const AdminProductsSlice = createSlice({
         state.isLoading = false;
         state.productList = [];
         console.error("Error fetching products:", action.error.message);
-      });      
+      });
   },
 });
 

@@ -19,7 +19,7 @@ const getAllOrdersOfAllUsers = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured!",
+      message: "Some error occurred!",
     });
   }
 };

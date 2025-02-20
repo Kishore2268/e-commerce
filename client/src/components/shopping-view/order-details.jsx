@@ -56,12 +56,16 @@ function ShoppingOrderDetailsView({ orderDetails }) {
             <ul className="grid gap-3">
               {orderDetails?.cartItems?.length > 0
                 ? orderDetails.cartItems.map((item, index) => (
-                    <li key={item.id || index} className="flex items-center justify-between">
-                      <span>Title: {item.title}</span>
-                      <span>Quantity: {item.quantity}</span>
-                      <span>Price: ${item.price}</span>
-                      <span>Color: {item.color}</span>
-                      <span>Size: {item.size}</span>
+                    <li key={item.id || index} className="grid gap-1">
+                      <div className="flex items-center justify-between font-medium">
+                        <span>{item.title}</span>
+                        <span>${item.price}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <div>Quantity: {item.quantity}</div>
+                        {item.size && <div>Size: {item.size.toUpperCase()}</div>}
+                        {item.color && <div>Color: {item.color}</div>}
+                      </div>
                     </li>
                   ))
                 : null}
@@ -97,12 +101,12 @@ ShoppingOrderDetailsView.propTypes = {
     orderStatus: PropTypes.string,
     cartItems: PropTypes.arrayOf(
       PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), 
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         title: PropTypes.string.isRequired,
         quantity: PropTypes.number.isRequired,
         price: PropTypes.number.isRequired,
-        color: PropTypes.string,
         size: PropTypes.string,
+        color: PropTypes.string,
       })
     ),
     addressInfo: PropTypes.shape({

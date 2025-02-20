@@ -15,7 +15,7 @@ const handleImageUpload = async (req, res) => {
     console.log(error);
     res.json({
       success: false,
-      message: "Error occured",
+      message: "Error occurred",
     });
   }
 };
@@ -28,10 +28,12 @@ const addProduct = async (req, res) => {
       title,
       description,
       category,
+      subCategory,
       brand,
       price,
       salePrice,
-      totalStock,
+      sizes,
+      colors,
       averageReview,
     } = req.body;
 
@@ -42,10 +44,12 @@ const addProduct = async (req, res) => {
       title,
       description,
       category,
+      subCategory,
       brand,
       price,
       salePrice,
-      totalStock,
+      sizes: category === "footwear" ? { footwear: sizes } : { clothing: sizes },
+      colors,
       averageReview,
     });
 
@@ -58,7 +62,7 @@ const addProduct = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Error occurred",
     });
   }
 };
@@ -76,7 +80,7 @@ const fetchAllProducts = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Error occurred",
     });
   }
 };
@@ -90,10 +94,12 @@ const editProduct = async (req, res) => {
       title,
       description,
       category,
+      subCategory,
       brand,
       price,
       salePrice,
-      totalStock,
+      sizes,
+      colors,
       averageReview,
     } = req.body;
 
@@ -107,12 +113,13 @@ const editProduct = async (req, res) => {
     findProduct.title = title || findProduct.title;
     findProduct.description = description || findProduct.description;
     findProduct.category = category || findProduct.category;
+    findProduct.subCategory = subCategory || findProduct.subCategory;
     findProduct.brand = brand || findProduct.brand;
     findProduct.price = price === "" ? 0 : price || findProduct.price;
     findProduct.salePrice =
       salePrice === "" ? 0 : salePrice || findProduct.salePrice;
-    findProduct.totalStock = totalStock || findProduct.totalStock;
-    findProduct.image = image || findProduct.image;
+    findProduct.sizes = category === "footwear" ? { footwear: sizes } : { clothing: sizes };
+    findProduct.colors = colors || findProduct.colors;
     findProduct.averageReview = averageReview || findProduct.averageReview;
 
     await findProduct.save();
@@ -124,7 +131,7 @@ const editProduct = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Error occurred",
     });
   }
 };
@@ -143,13 +150,13 @@ const deleteProduct = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Product delete successfully",
+      message: "Product deleted successfully",
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Error occurred",
     });
   }
 };

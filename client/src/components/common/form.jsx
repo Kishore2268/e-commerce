@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import {
   Select,
   SelectContent,
@@ -18,6 +17,8 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled,
+  onCategoryChange,
+  hideSubmitButton = false,
 }) {
   function renderInputsByComponentType(getControlItem) {
     let element = null;
@@ -42,39 +43,47 @@ function CommonForm({
         );
         break;
 
-      case "select":
+      case "select": {
+        let options = getControlItem.options;
+        if (getControlItem.dependsOn) {
+          const parentValue = formData[getControlItem.dependsOn];
+          options = parentValue ? getControlItem.options[parentValue] : [];
+        }
+        
         element = (
           <Select
-            onValueChange={(value) =>
+            onValueChange={(value) => {
+              if (getControlItem.name === "category" && onCategoryChange) {
+                onCategoryChange(value);
+              }
               setFormData({
                 ...formData,
                 [getControlItem.name]: value,
-              })
-            }
+              });
+            }}
             value={value}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={getControlItem.label} />
+              <SelectValue placeholder={getControlItem.placeholder || "Select an option"} />
             </SelectTrigger>
             <SelectContent>
-              {getControlItem.options && getControlItem.options.length > 0
-                ? getControlItem.options.map((optionItem) => (
-                    <SelectItem key={optionItem.id} value={optionItem.id}>
-                      {optionItem.label}
-                    </SelectItem>
-                  ))
-                : null}
+              {options?.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         );
         break;
+      }
 
       case "textarea":
         element = (
           <Textarea
             name={getControlItem.name}
             placeholder={getControlItem.placeholder}
-            id={getControlItem.id}
+            id={getControlItem.name}
             value={value}
             onChange={(event) =>
               setFormData({
@@ -87,21 +96,7 @@ function CommonForm({
         break;
 
       default:
-        element = (
-          <Input
-            name={getControlItem.name}
-            placeholder={getControlItem.placeholder}
-            id={getControlItem.name}
-            type={getControlItem.type}
-            value={value}
-            onChange={(event) =>
-              setFormData({
-                ...formData,
-                [getControlItem.name]: event.target.value,
-              })
-            }
-          />
-        );
+        element = null;
         break;
     }
 
@@ -110,17 +105,25 @@ function CommonForm({
 
   return (
     <form onSubmit={onSubmit}>
-      <div className="flex flex-col gap-3">
+      <div className="grid gap-4">
         {formControls.map((controlItem) => (
-          <div className="grid w-full gap-1.5" key={controlItem.name}>
-            <Label className="mb-1">{controlItem.label}</Label>
+          <div key={controlItem.name}>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {controlItem.label}
+            </label>
             {renderInputsByComponentType(controlItem)}
           </div>
         ))}
       </div>
-      <Button disabled={isBtnDisabled} type="submit" className="mt-2 w-full">
-        {buttonText || "Submit"}
-      </Button>
+      {!hideSubmitButton && (
+        <Button
+          type="submit"
+          className="mt-4 w-full"
+          disabled={isBtnDisabled}
+        >
+          {buttonText}
+        </Button>
+      )}
     </form>
   );
 }
@@ -148,6 +151,8 @@ CommonForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   buttonText: PropTypes.string,
   isBtnDisabled: PropTypes.bool,
+  onCategoryChange: PropTypes.func,
+  hideSubmitButton: PropTypes.bool,
 };
 
 export default CommonForm;

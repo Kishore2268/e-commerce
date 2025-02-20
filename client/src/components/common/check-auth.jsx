@@ -65,7 +65,7 @@ CheckAuth.propTypes = {
   user: PropTypes.shape({
     role: PropTypes.string,
   }),
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };
 
 export default CheckAuth;

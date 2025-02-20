@@ -10,7 +10,6 @@ const addProductReview = async (req, res) => {
     const order = await Order.findOne({
       userId,
       "cartItems.productId": productId,
-      // orderStatus: "confirmed" || "delivered",
     });
 
     if (!order) {
@@ -20,12 +19,12 @@ const addProductReview = async (req, res) => {
       });
     }
 
-    const checkExistinfReview = await ProductReview.findOne({
+    const checkExistingReview = await ProductReview.findOne({
       productId,
       userId,
     });
 
-    if (checkExistinfReview) {
+    if (checkExistingReview) {
       return res.status(400).json({
         success: false,
         message: "You already reviewed this product!",

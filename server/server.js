@@ -13,8 +13,10 @@ const shopOrderRouter = require("./routes/shop/order-routes");
 const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
 
-const commonFeatureRouter = require("./routes/common/feature-routes");
+// Import the wishlist routes
+const shopWishlistRouter = require("./routes/shop/wishlist-routes");
 
+const commonFeatureRouter = require("./routes/common/feature-routes");
 
 mongoose
   .connect("mongodb+srv://kishore:KishSabi%402268@anivarti.cp7lj.mongodb.net/clothing-store")
@@ -25,7 +27,6 @@ const app = express();
 const path = require("path");
 
 const PORT = process.env.PORT || 5000;
-
 
 app.use(
   cors({
@@ -45,7 +46,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
@@ -57,6 +57,9 @@ app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
 
+// Add the wishlist routes
+app.use("/api/shop/wishlist", shopWishlistRouter);
+
 app.use("/api/common/feature", commonFeatureRouter);
 
 // Serve static files from Vite build
@@ -66,7 +69,5 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
-
-
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));

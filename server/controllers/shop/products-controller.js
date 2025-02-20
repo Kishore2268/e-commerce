@@ -2,7 +2,7 @@ const Product = require("../../models/Product");
 
 const getFilteredProducts = async (req, res) => {
   try {
-    const { category = [], brand = [], sortBy = "price-lowtohigh" } = req.query;
+    const { category = [], brand = [], sortBy = "price-lowtohigh", sizes = [], colors = [], subCategory = [] } = req.query;
 
     let filters = {};
 
@@ -10,8 +10,16 @@ const getFilteredProducts = async (req, res) => {
       filters.category = { $in: category.split(",") };
     }
 
+    if (subCategory.length) {
+      filters.subCategory = { $in: subCategory.split(",") };
+    }
+
     if (brand.length) {
       filters.brand = { $in: brand.split(",") };
+    }
+
+    if (colors.length) {
+      filters.colors = { $in: colors.split(",") };
     }
 
     let sort = {};
@@ -19,22 +27,16 @@ const getFilteredProducts = async (req, res) => {
     switch (sortBy) {
       case "price-lowtohigh":
         sort.price = 1;
-
         break;
       case "price-hightolow":
         sort.price = -1;
-
         break;
       case "title-atoz":
         sort.title = 1;
-
         break;
-
       case "title-ztoa":
         sort.title = -1;
-
         break;
-
       default:
         sort.price = 1;
         break;
@@ -42,15 +44,32 @@ const getFilteredProducts = async (req, res) => {
 
     const products = await Product.find(filters).sort(sort);
 
+    const productsWithStock = products.map(product => {
+      const stock = {};
+      if (product.category === "clothing") {
+        product.sizes.clothing.forEach(size => {
+          stock[size.size] = size.stock;
+        });
+      } else if (product.category === "footwear") {
+        stock.sizes = product.sizes.footwear; // Array of sizes from 1 to 14
+      } else if (product.category === "accessories") {
+        stock.total = product.stock; // Total stock for accessories
+      }
+      return {
+        ...product.toObject(),
+        stock,
+      };
+    });
+
     res.status(200).json({
       success: true,
-      data: products,
+      data: productsWithStock,
     });
   } catch (e) {
-    console.log(error);
+    console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Some error occurred",
     });
   }
 };
@@ -66,15 +85,31 @@ const getProductDetails = async (req, res) => {
         message: "Product not found!",
       });
 
+    const stock = {};
+    if (product.category === "clothing") {
+      product.sizes.clothing.forEach(size => {
+        stock[size.size] = size.stock;
+      });
+    } else if (product.category === "footwear") {
+      stock.sizes = product.sizes.footwear; // Array of sizes from 1 to 14
+    } else if (product.category === "accessories") {
+      stock.total = product.stock; // Total stock for accessories
+    }
+
+    const productWithStock = {
+      ...product.toObject(),
+      stock,
+    };
+
     res.status(200).json({
       success: true,
-      data: product,
+      data: productWithStock,
     });
   } catch (e) {
-    console.log(error);
+    console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Some error occurred",
     });
   }
 };
