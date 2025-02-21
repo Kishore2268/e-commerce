@@ -21,36 +21,12 @@ function ProductImageUpload({
 
   console.log(isEditMode, "isEditMode");
 
-  async function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setImageLoadingState(true);
+  function handleImageFileChange(event) {
+    console.log(event.target.files, "event.target.files");
+    const selectedFile = event.target.files?.[0];
+    console.log(selectedFile);
 
-      const formData = new FormData();
-      formData.append("my_file", file);
-
-      try {
-        const response = await axios.post(
-          "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            withCredentials: true
-          }
-        );
-
-        if (response.data.success) {
-          setUploadedImageUrl(response.data.imageUrl);
-          setImageLoadingState(false);
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        setImageLoadingState(false);
-      }
-    }
+    if (selectedFile) setImageFile(selectedFile);
   }
 
   function handleDragOver(event) {
@@ -70,6 +46,45 @@ function ProductImageUpload({
     }
   }
 
+  async function uploadImageToCloudinary() {
+    try {
+      setImageLoadingState(true);
+      const data = new FormData();
+      data.append("my_file", imageFile);
+      
+      const response = await axios.post(
+        "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true
+        }
+      );
+
+      if (response?.data?.success) {
+        const imageUrl = response.data.imageUrl;
+        console.log("Received image URL:", imageUrl); // Debug log
+        setUploadedImageUrl(imageUrl); // This should now be a string URL
+      } else {
+        throw new Error(response?.data?.message || "Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setImageLoadingState(false);
+    }
+  }
+
+  useEffect(() => {
+    if (imageFile !== null) uploadImageToCloudinary();
+  }, [imageFile]);
+
+  useEffect(() => {
+    console.log("Current uploadedImageUrl:", uploadedImageUrl);
+  }, [uploadedImageUrl]);
+
   return (
     <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>
       <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
@@ -85,8 +100,7 @@ function ProductImageUpload({
           type="file"
           className="hidden"
           ref={inputRef}
-          onChange={handleImageUpload}
-          accept="image/*"
+          onChange={handleImageFileChange}
           disabled={isEditMode}
         />
         {!imageFile ? (
@@ -120,13 +134,14 @@ function ProductImageUpload({
         )}
       </div>
 
-      {/* Display the uploaded image if available */}
-      {uploadedImageUrl && (
-        <div className="mt-2 flex justify-center">
+      {/* Only show the image if uploadedImageUrl is a string */}
+      {uploadedImageUrl && typeof uploadedImageUrl === 'string' && (
+        <div className="mt-4">
           <img
             src={uploadedImageUrl}
-            alt="Uploaded"
-            className="max-w-full h-auto rounded-lg shadow-md"
+            alt="Uploaded product"
+            className="mt-2 max-w-full h-auto rounded-lg shadow-md"
+            onError={(e) => console.error("Image load error:", e)}
           />
         </div>
       )}

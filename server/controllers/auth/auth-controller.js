@@ -37,52 +37,64 @@ const registerUser = async (req, res) => {
 
 //login
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    const checkUser = await User.findOne({ email });
-    if (!checkUser)
-      return res.json({
-        success: false,
-        message: "User doesn't exists! Please register first",
-      });
+    const { email, password } = req.body;
 
-    const checkPasswordMatch = await bcrypt.compare(
-      password,
-      checkUser.password
-    );
-    if (!checkPasswordMatch)
-      return res.json({
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
         success: false,
-        message: "Incorrect password! Please try again",
+        message: "User does not exist",
       });
+    }
 
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Create token
     const token = jwt.sign(
-      {
-        id: checkUser._id,
-        role: checkUser.role,
-        email: checkUser.email,
-        userName: checkUser.userName,
+      { 
+        id: user._id,
+        email: user.email,
+        isAdmin: user.role === "admin" 
       },
-      "CLIENT_SECRET_KEY",
-      { expiresIn: "60m" }
+      process.env.JWT_SECRET || "CLIENT_SECRET_KEY",
+      { expiresIn: "24h" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: false }).json({
+    // Set cookie options
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    };
+
+    // Set the cookie
+    res.cookie("token", token, cookieOptions);
+
+    console.log("Login successful, token set:", token);
+
+    res.status(200).json({
       success: true,
       message: "Logged in successfully",
       user: {
-        email: checkUser.email,
-        role: checkUser.role,
-        id: checkUser._id,
-        userName: checkUser.userName,
+        id: user._id,
+        email: user.email,
+        role: user.role,
       },
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Error logging in",
+      error: error.message,
     });
   }
 };
@@ -98,21 +110,47 @@ const logoutUser = (req, res) => {
 
 //auth middleware
 const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token)
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorised user!",
-    });
-
   try {
-    const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
-    req.user = decoded;
-    next();
+    console.log("Cookies received:", req.cookies); // Log all cookies
+    console.log("Headers:", req.headers); // Log all headers
+    
+    const token = req.cookies.token;
+    console.log("Token from cookies:", token);
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "No authentication token found in cookies",
+      });
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "CLIENT_SECRET_KEY");
+      console.log("Decoded token:", decoded);
+      req.user = decoded;
+
+      // Check if user is admin
+      if (!decoded.isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: "User is not an admin",
+        });
+      }
+
+      next();
+    } catch (error) {
+      console.error("Token verification error:", error);
+      res.status(401).json({
+        success: false,
+        message: `Token verification failed: ${error.message}`,
+      });
+    }
   } catch (error) {
-    res.status(401).json({
+    console.error("Auth middleware error:", error);
+    res.status(500).json({
       success: false,
-      message: "Unauthorised user!",
+      message: "Server error in auth middleware",
+      error: error.message
     });
   }
 };

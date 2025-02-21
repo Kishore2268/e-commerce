@@ -7,30 +7,49 @@ const initialState = {
 };
 
 export const addNewProduct = createAsyncThunk(
-  "/admin/products/add",
+  "admin/products/add",
   async (formData) => {
-    const response = await axios.post(
-      "https://clothing-store-ta8c.onrender.com/api/admin/products/add",
-      formData,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json"
+    try {
+      console.log("Sending request with formData:", formData);
+      
+      const transformedData = {
+        ...formData,
+        image: formData.image?.secure_url || formData.image
+      };
+
+      const response = await axios.post(
+        "https://clothing-store-ta8c.onrender.com/api/admin/products/add",
+        transformedData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
+
+      console.log("Server response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Request error:", error.response || error);
+      if (error.response?.status === 401) {
+        throw new Error("Authentication failed. Please try logging in again.");
       }
-    );
-    return response.data;
+      throw new Error(error.response?.data?.message || "Failed to add product");
+    }
   }
 );
 
 export const fetchAllProducts = createAsyncThunk(
-  "/products/fetchAllProducts",
+  "admin/products/getAll",
   async () => {
-    const result = await axios.get(
-      "https://clothing-store-ta8c.onrender.com/api/admin/products/get"
+    const response = await axios.get(
+      "https://clothing-store-ta8c.onrender.com/api/admin/products/get",
+      {
+        withCredentials: true,
+      }
     );
-
-    return result?.data;
+    return response.data;
   }
 );
 

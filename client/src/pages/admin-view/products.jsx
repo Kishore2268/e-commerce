@@ -113,7 +113,8 @@ function AdminProducts() {
 
     const submitData = {
       ...formData,
-      image: uploadedImageUrl, // Add the uploaded image URL
+      // Use the secure_url if image is a Cloudinary object, otherwise use the image value
+      image: formData.image?.secure_url || formData.image,
       ...(formData.category === "accessories" && { stock: formData.totalStock })
     };
 
@@ -128,7 +129,7 @@ function AdminProducts() {
           setFormData(initialFormData);
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
-          setUploadedImageUrl(""); // Reset image URL
+          setUploadedImageUrl("");
         }
       });
     } else {
@@ -138,16 +139,10 @@ function AdminProducts() {
           dispatch(fetchAllProducts());
           setOpenCreateProductsDialog(false);
           setImageFile(null);
-          setUploadedImageUrl(""); // Reset image URL
+          setUploadedImageUrl("");
           setFormData(initialFormData);
           toast({
             title: "Product added successfully",
-          });
-        } else {
-          toast({
-            title: "Failed to add product",
-            description: data?.payload?.message || "Unknown error occurred",
-            variant: "destructive"
           });
         }
       })
@@ -185,6 +180,16 @@ function AdminProducts() {
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
+  // Add this useEffect to update formData when uploadedImageUrl changes
+  useEffect(() => {
+    if (uploadedImageUrl) {
+      setFormData(prev => ({
+        ...prev,
+        image: uploadedImageUrl
+      }));
+    }
+  }, [uploadedImageUrl]);
+
   console.log(formData, "productList");
 
   // Render size/stock inputs based on category
@@ -219,6 +224,16 @@ function AdminProducts() {
     ));
   };
 
+  // Reset states when dialog closes
+  const handleDialogClose = () => {
+    setOpenCreateProductsDialog(false);
+    setCurrentEditedId(null);
+    setFormData(initialFormData);
+    setImageFile(null);
+    setUploadedImageUrl(""); // Reset to empty string
+    setImageLoadingState(false);
+  };
+
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
@@ -242,11 +257,7 @@ function AdminProducts() {
       </div>
       <Sheet
         open={openCreateProductsDialog}
-        onOpenChange={() => {
-          setOpenCreateProductsDialog(false);
-          setCurrentEditedId(null);
-          setFormData(initialFormData);
-        }}
+        onOpenChange={handleDialogClose}
       >
         <SheetContent side="right" className="overflow-auto">
           <SheetHeader>

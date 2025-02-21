@@ -11,19 +11,19 @@ const handleImageUpload = async (req, res) => {
       });
     }
 
-    const b64 = Buffer.from(req.file.buffer).toString("base64");
-    const url = "data:" + req.file.mimetype + ";base64," + b64;
-    const result = await imageUploadUtil(url);
+    const result = await imageUploadUtil(req.file);
 
     res.status(200).json({
       success: true,
-      imageUrl: result
+      imageUrl: result.secure_url,
+      message: "Image uploaded successfully"
     });
   } catch (error) {
-    console.error("Error uploading image:", error);
+    console.error("Error in handleImageUpload:", error);
     res.status(500).json({
       success: false,
-      message: "Error uploading image"
+      message: "Error uploading image",
+      error: error.message
     });
   }
 };
