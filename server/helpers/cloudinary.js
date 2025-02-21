@@ -2,20 +2,30 @@ const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 
 cloudinary.config({
-  cloud_name: "dwaupldob",
-  api_key: "496826653112345",
-  api_secret: "ATCC5bpO12ihgbMUPGnqL9gDyxw",
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const storage = new multer.memoryStorage();
 
-async function imageUploadUtil(file) {
-  const result = await cloudinary.uploader.upload(file, {
-    resource_type: "auto",
-  });
-
-  return result;
-}
+const imageUploadUtil = async (file) => {
+  try {
+    // Convert buffer to base64
+    const b64 = Buffer.from(file.buffer).toString("base64");
+    const dataURI = "data:" + file.mimetype + ";base64," + b64;
+    
+    const result = await cloudinary.uploader.upload(dataURI, {
+      resource_type: "auto",
+      folder: "clothing-store"
+    });
+    
+    return result;
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    throw error;
+  }
+};
 
 const upload = multer({ storage });
 

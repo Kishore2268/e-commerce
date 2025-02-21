@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require('multer');
 
 const {
   handleImageUpload,
@@ -8,12 +9,15 @@ const {
   deleteProduct,
 } = require("../../controllers/admin/products-controller");
 
-const { upload } = require("../../helpers/cloudinary");
 const { authMiddleware } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
 
-router.post("/upload-image", upload.single("my_file"), handleImageUpload);
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post("/upload-image", authMiddleware, upload.single("my_file"), handleImageUpload);
 router.post("/add", authMiddleware, addProduct);
 router.put("/edit/:id", editProduct);
 router.delete("/delete/:id", deleteProduct);

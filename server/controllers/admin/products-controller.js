@@ -1,6 +1,11 @@
 const { imageUploadUtil } = require("../../helpers/cloudinary");
 const Product = require("../../models/Product");
 const { authMiddleware } = require("../auth/auth-controller");
+const multer = require('multer');
+
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const handleImageUpload = async (req, res) => {
   try {
@@ -11,13 +16,18 @@ const handleImageUpload = async (req, res) => {
       });
     }
 
+    console.log("Received file:", req.file); // Debug log
+
     const result = await imageUploadUtil(req.file);
+    
+    console.log("Cloudinary result:", result); // Debug log
 
     res.status(200).json({
       success: true,
       imageUrl: result.secure_url,
       message: "Image uploaded successfully"
     });
+
   } catch (error) {
     console.error("Error in handleImageUpload:", error);
     res.status(500).json({
