@@ -54,14 +54,12 @@ function ProductImageUpload({
       const data = new FormData();
       data.append("my_file", imageFile);
       
-      console.log("Starting image upload for file:", imageFile.name);
-
       const response = await axios.post(
         "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
         data,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data"
           },
           withCredentials: true
         }
@@ -70,24 +68,17 @@ function ProductImageUpload({
       console.log("Upload response:", response.data);
 
       if (response?.data?.success) {
-        const imageUrl = response.data.imageUrl;
-        console.log("Successfully received image URL:", imageUrl);
-        setUploadedImageUrl(imageUrl);
-        
-        // Notify parent component
-        if (typeof setFormData === 'function') {
-          setFormData(prev => ({
-            ...prev,
-            image: imageUrl
-          }));
-        }
+        setUploadedImageUrl(response.data.result.secure_url);
+        toast({
+          title: "Image uploaded successfully",
+        });
       } else {
-        throw new Error(response?.data?.message || "Failed to upload image");
+        throw new Error(response.data.message || "Upload failed");
       }
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Upload error:", error);
       toast({
-        title: "Error uploading image",
+        title: "Upload failed",
         description: error.message,
         variant: "destructive"
       });
