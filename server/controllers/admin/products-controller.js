@@ -15,22 +15,25 @@ const upload = multer({
 const handleImageUpload = async (req, res) => {
   try {
     if (!req.file) {
+      console.log("No file received in request");
       return res.status(400).json({
         success: false,
         message: "No file uploaded"
       });
     }
 
-    // Log file details for debugging
-    console.log("Received file:", {
-      filename: req.file.originalname,
-      mimetype: req.file.mimetype,
-      size: req.file.size
+    console.log("Processing upload request:", {
+      fileSize: req.file.size,
+      mimeType: req.file.mimetype,
+      fileName: req.file.originalname
     });
 
     const result = await imageUploadUtil(req.file);
 
-    console.log("Cloudinary response:", result);
+    console.log("Upload successful:", {
+      url: result.secure_url,
+      publicId: result.public_id
+    });
 
     res.json({
       success: true,
@@ -40,11 +43,19 @@ const handleImageUpload = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Image upload error:", error);
+    console.error("Detailed upload error:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
     res.status(500).json({
       success: false,
-      message: "Error occurred during upload",
-      error: error.message
+      message: "Error during image upload",
+      error: {
+        message: error.message,
+        type: error.name
+      }
     });
   }
 };

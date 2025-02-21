@@ -51,35 +51,62 @@ function ProductImageUpload({
   async function uploadImageToCloudinary() {
     try {
       setImageLoadingState(true);
+      
+      if (!imageFile) {
+        throw new Error("No file selected");
+      }
+
+      console.log("Preparing to upload file:", {
+        name: imageFile.name,
+        size: imageFile.size,
+        type: imageFile.type
+      });
+
       const data = new FormData();
       data.append("my_file", imageFile);
-      
+
+      // Get the token from wherever you store it (localStorage, Redux, etc.)
+      const token = localStorage.getItem('token'); // adjust based on your auth setup
+
       const response = await axios.post(
         "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
         data,
         {
           headers: {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}` // Add if you're using token auth
           },
-          withCredentials: true
+          withCredentials: true,
+          timeout: 30000,
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Upload progress: ${percentCompleted}%`);
+          }
         }
       );
 
-      console.log("Upload response:", response.data);
+      console.log("Server response:", response.data);
 
       if (response?.data?.success) {
         setUploadedImageUrl(response.data.result.secure_url);
         toast({
-          title: "Image uploaded successfully",
+          title: "Success",
+          description: "Image uploaded successfully",
         });
       } else {
         throw new Error(response.data.message || "Upload failed");
       }
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Upload error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        serverMessage: error.response?.data?.error?.message
+      });
+
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: error.response?.data?.error?.message || error.message,
         variant: "destructive"
       });
     } finally {
