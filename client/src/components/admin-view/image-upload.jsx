@@ -6,7 +6,6 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { Skeleton } from "../ui/skeleton";
 import PropTypes from "prop-types";
-import { toast } from "../ui/use-toast";
 
 function ProductImageUpload({
   imageFile,
@@ -17,7 +16,6 @@ function ProductImageUpload({
   setImageLoadingState,
   isEditMode,
   isCustomStyling = false,
-  setFormData,
 }) {
   const inputRef = useRef(null);
 
@@ -49,67 +47,17 @@ function ProductImageUpload({
   }
 
   async function uploadImageToCloudinary() {
-    try {
-      setImageLoadingState(true);
-      
-      if (!imageFile) {
-        throw new Error("No file selected");
-      }
+    setImageLoadingState(true);
+    const data = new FormData();
+    data.append("my_file", imageFile);
+    const response = await axios.post(
+      "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
+      data
+    );
+    console.log(response, "response");
 
-      console.log("Preparing to upload file:", {
-        name: imageFile.name,
-        size: imageFile.size,
-        type: imageFile.type
-      });
-
-      const data = new FormData();
-      data.append("my_file", imageFile);
-
-      // Get the token from wherever you store it (localStorage, Redux, etc.)
-      const token = localStorage.getItem('token'); // adjust based on your auth setup
-
-      const response = await axios.post(
-        "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "Authorization": `Bearer ${token}` // Add if you're using token auth
-          },
-          withCredentials: true,
-          timeout: 30000,
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`Upload progress: ${percentCompleted}%`);
-          }
-        }
-      );
-
-      console.log("Server response:", response.data);
-
-      if (response?.data?.success) {
-        setUploadedImageUrl(response.data.result.secure_url);
-        toast({
-          title: "Success",
-          description: "Image uploaded successfully",
-        });
-      } else {
-        throw new Error(response.data.message || "Upload failed");
-      }
-    } catch (error) {
-      console.error("Upload error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        serverMessage: error.response?.data?.error?.message
-      });
-
-      toast({
-        title: "Upload failed",
-        description: error.response?.data?.error?.message || error.message,
-        variant: "destructive"
-      });
-    } finally {
+    if (response?.data?.success) {
+      setUploadedImageUrl(response.data.result.url);
       setImageLoadingState(false);
     }
   }
@@ -117,10 +65,6 @@ function ProductImageUpload({
   useEffect(() => {
     if (imageFile !== null) uploadImageToCloudinary();
   }, [imageFile]);
-
-  useEffect(() => {
-    console.log("Current uploadedImageUrl:", uploadedImageUrl);
-  }, [uploadedImageUrl]);
 
   return (
     <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>
@@ -171,14 +115,13 @@ function ProductImageUpload({
         )}
       </div>
 
-      {/* Only show the image if uploadedImageUrl is a string */}
-      {uploadedImageUrl && typeof uploadedImageUrl === 'string' && (
-        <div className="mt-4">
+      {/* Display the uploaded image if available */}
+      {uploadedImageUrl && (
+        <div className="mt-2 flex justify-center">
           <img
             src={uploadedImageUrl}
-            alt="Uploaded product"
-            className="mt-2 max-w-full h-auto rounded-lg shadow-md"
-            onError={(e) => console.error("Image load error:", e)}
+            alt="Uploaded"
+            className="max-w-full h-auto rounded-lg shadow-md"
           />
         </div>
       )}
@@ -195,7 +138,6 @@ ProductImageUpload.propTypes = {
   setImageLoadingState: PropTypes.func.isRequired, // Function to update loading state
   isEditMode: PropTypes.bool.isRequired, // Boolean flag for edit mode
   isCustomStyling: PropTypes.bool, // Optional boolean with default false
-  setFormData: PropTypes.func, // Optional function to update form data
 };
 
 export default ProductImageUpload;

@@ -7,47 +7,30 @@ const initialState = {
 };
 
 export const addNewProduct = createAsyncThunk(
-  "admin/products/add",
+  "/products/addnewproduct",
   async (formData) => {
-    try {
-      console.log("Adding product with data:", formData);
+    const result = await axios.post(
+      "https://clothing-store-ta8c.onrender.com/api/admin/products/add",
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      const submitData = {
-        ...formData,
-        image: typeof formData.image === 'string' ? formData.image : null
-      };
-
-      console.log("Transformed data for submission:", submitData);
-
-      const response = await axios.post(
-        "https://clothing-store-ta8c.onrender.com/api/admin/products/add",
-        submitData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      return response.data;
-    } catch (error) {
-      console.error("Error adding product:", error);
-      throw error;
-    }
+    return result?.data;
   }
 );
 
 export const fetchAllProducts = createAsyncThunk(
-  "admin/products/getAll",
+  "/products/fetchAllProducts",
   async () => {
-    const response = await axios.get(
-      "https://clothing-store-ta8c.onrender.com/api/admin/products/get",
-      {
-        withCredentials: true,
-      }
+    const result = await axios.get(
+      "https://clothing-store-ta8c.onrender.com/api/admin/products/get"
     );
-    return response.data;
+
+    return result?.data;
   }
 );
 

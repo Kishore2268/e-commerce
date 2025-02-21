@@ -102,22 +102,10 @@ function AdminProducts() {
   function onSubmit(event) {
     event.preventDefault();
     
-    // Check if image is uploaded
-    if (!uploadedImageUrl && !currentEditedId) {
-      toast({
-        title: "Please upload an image",
-        variant: "destructive"
-      });
-      return;
-    }
-
     const submitData = {
       ...formData,
-      image: uploadedImageUrl,
       ...(formData.category === "accessories" && { stock: formData.totalStock })
     };
-
-    console.log("Submitting data:", submitData);
 
     if (currentEditedId !== null) {
       dispatch(editProduct({
@@ -125,35 +113,31 @@ function AdminProducts() {
         formData: submitData,
       }))
       .then((data) => {
+        console.log(data, "edit");
+
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
           setFormData(initialFormData);
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
-          setUploadedImageUrl("");
         }
       });
     } else {
-      dispatch(addNewProduct(submitData))
-        .then((data) => {
-          if (data?.payload?.success) {
-            dispatch(fetchAllProducts());
-            setOpenCreateProductsDialog(false);
-            setImageFile(null);
-            setUploadedImageUrl("");
-            setFormData(initialFormData);
-            toast({
-              title: "Product added successfully",
-            });
-          }
-        })
-        .catch(error => {
+      dispatch(addNewProduct({
+        ...submitData,
+        image: uploadedImageUrl,
+      }))
+      .then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          setOpenCreateProductsDialog(false);
+          setImageFile(null);
+          setFormData(initialFormData);
           toast({
-            title: "Error adding product",
-            description: error.message,
-            variant: "destructive"
+            title: "Product added successfully",
           });
-        });
+        }
+      });
     }
   }
 
@@ -168,29 +152,13 @@ function AdminProducts() {
   function isFormValid() {
     return Object.keys(formData)
       .filter((currentKey) => currentKey !== "averageReview")
-      .map((key) => {
-        if (key === "image") {
-          return currentEditedId !== null || uploadedImageUrl !== "";
-        }
-        return formData[key] !== "";
-      })
+      .map((key) => formData[key] !== "")
       .every((item) => item);
   }
 
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
-
-  // Add this useEffect to update formData when uploadedImageUrl changes
-  useEffect(() => {
-    if (uploadedImageUrl) {
-      console.log("Setting image URL in form data:", uploadedImageUrl);
-      setFormData(prev => ({
-        ...prev,
-        image: uploadedImageUrl
-      }));
-    }
-  }, [uploadedImageUrl]);
 
   console.log(formData, "productList");
 
@@ -226,16 +194,6 @@ function AdminProducts() {
     ));
   };
 
-  // Reset states when dialog closes
-  const handleDialogClose = () => {
-    setOpenCreateProductsDialog(false);
-    setCurrentEditedId(null);
-    setFormData(initialFormData);
-    setImageFile(null);
-    setUploadedImageUrl(""); // Reset to empty string
-    setImageLoadingState(false);
-  };
-
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
@@ -259,7 +217,11 @@ function AdminProducts() {
       </div>
       <Sheet
         open={openCreateProductsDialog}
-        onOpenChange={handleDialogClose}
+        onOpenChange={() => {
+          setOpenCreateProductsDialog(false);
+          setCurrentEditedId(null);
+          setFormData(initialFormData);
+        }}
       >
         <SheetContent side="right" className="overflow-auto">
           <SheetHeader>

@@ -9,7 +9,6 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
 
 function CommonForm({
   formControls,
@@ -96,38 +95,6 @@ function CommonForm({
         );
         break;
 
-      case "multiselect":
-        element = (
-          <div className="grid grid-cols-2 gap-2">
-            {getControlItem.options.map((option) => (
-              <div key={option.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${getControlItem.name}-${option.id}`}
-                  checked={(formData[getControlItem.name] || []).includes(option.id)}
-                  onCheckedChange={(checked) => {
-                    const currentValues = formData[getControlItem.name] || [];
-                    const newValues = checked
-                      ? [...currentValues, option.id]
-                      : currentValues.filter((value) => value !== option.id);
-                    
-                    setFormData({
-                      ...formData,
-                      [getControlItem.name]: newValues,
-                    });
-                  }}
-                />
-                <label
-                  htmlFor={`${getControlItem.name}-${option.id}`}
-                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {option.label}
-                </label>
-              </div>
-            ))}
-          </div>
-        );
-        break;
-
       default:
         element = null;
         break;
@@ -169,7 +136,7 @@ CommonForm.propTypes = {
       label: PropTypes.string.isRequired,
       placeholder: PropTypes.string,
       type: PropTypes.string,
-      componentType: PropTypes.oneOf(["input", "select", "textarea", "multiselect"]),
+      componentType: PropTypes.oneOf(["input", "select", "textarea"]),
       options: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
