@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { Skeleton } from "../ui/skeleton";
 import PropTypes from "prop-types";
+import { toast } from "../ui/use-toast";
 
 function ProductImageUpload({
   imageFile,
@@ -16,6 +17,7 @@ function ProductImageUpload({
   setImageLoadingState,
   isEditMode,
   isCustomStyling = false,
+  setFormData,
 }) {
   const inputRef = useRef(null);
 
@@ -52,7 +54,7 @@ function ProductImageUpload({
       const data = new FormData();
       data.append("my_file", imageFile);
       
-      console.log("Uploading file:", imageFile); // Debug log
+      console.log("Starting image upload for file:", imageFile.name);
 
       const response = await axios.post(
         "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
@@ -65,18 +67,30 @@ function ProductImageUpload({
         }
       );
 
-      console.log("Upload response:", response.data); // Debug log
+      console.log("Upload response:", response.data);
 
       if (response?.data?.success) {
         const imageUrl = response.data.imageUrl;
-        console.log("Setting image URL:", imageUrl);
+        console.log("Successfully received image URL:", imageUrl);
         setUploadedImageUrl(imageUrl);
+        
+        // Notify parent component
+        if (typeof setFormData === 'function') {
+          setFormData(prev => ({
+            ...prev,
+            image: imageUrl
+          }));
+        }
       } else {
         throw new Error(response?.data?.message || "Failed to upload image");
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      // You might want to show an error toast here
+      toast({
+        title: "Error uploading image",
+        description: error.message,
+        variant: "destructive"
+      });
     } finally {
       setImageLoadingState(false);
     }
@@ -163,6 +177,7 @@ ProductImageUpload.propTypes = {
   setImageLoadingState: PropTypes.func.isRequired, // Function to update loading state
   isEditMode: PropTypes.bool.isRequired, // Boolean flag for edit mode
   isCustomStyling: PropTypes.bool, // Optional boolean with default false
+  setFormData: PropTypes.func, // Optional function to update form data
 };
 
 export default ProductImageUpload;

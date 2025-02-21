@@ -10,16 +10,18 @@ export const addNewProduct = createAsyncThunk(
   "admin/products/add",
   async (formData) => {
     try {
-      console.log("Sending request with formData:", formData);
-      
-      const transformedData = {
+      console.log("Adding product with data:", formData);
+
+      const submitData = {
         ...formData,
-        image: formData.image?.secure_url || formData.image
+        image: typeof formData.image === 'string' ? formData.image : null
       };
+
+      console.log("Transformed data for submission:", submitData);
 
       const response = await axios.post(
         "https://clothing-store-ta8c.onrender.com/api/admin/products/add",
-        transformedData,
+        submitData,
         {
           withCredentials: true,
           headers: {
@@ -28,14 +30,10 @@ export const addNewProduct = createAsyncThunk(
         }
       );
 
-      console.log("Server response:", response.data);
       return response.data;
     } catch (error) {
-      console.error("Request error:", error.response || error);
-      if (error.response?.status === 401) {
-        throw new Error("Authentication failed. Please try logging in again.");
-      }
-      throw new Error(error.response?.data?.message || "Failed to add product");
+      console.error("Error adding product:", error);
+      throw error;
     }
   }
 );

@@ -113,10 +113,11 @@ function AdminProducts() {
 
     const submitData = {
       ...formData,
-      // Use the secure_url if image is a Cloudinary object, otherwise use the image value
-      image: formData.image?.secure_url || formData.image,
+      image: uploadedImageUrl,
       ...(formData.category === "accessories" && { stock: formData.totalStock })
     };
+
+    console.log("Submitting data:", submitData);
 
     if (currentEditedId !== null) {
       dispatch(editProduct({
@@ -134,25 +135,25 @@ function AdminProducts() {
       });
     } else {
       dispatch(addNewProduct(submitData))
-      .then((data) => {
-        if (data?.payload?.success) {
-          dispatch(fetchAllProducts());
-          setOpenCreateProductsDialog(false);
-          setImageFile(null);
-          setUploadedImageUrl("");
-          setFormData(initialFormData);
+        .then((data) => {
+          if (data?.payload?.success) {
+            dispatch(fetchAllProducts());
+            setOpenCreateProductsDialog(false);
+            setImageFile(null);
+            setUploadedImageUrl("");
+            setFormData(initialFormData);
+            toast({
+              title: "Product added successfully",
+            });
+          }
+        })
+        .catch(error => {
           toast({
-            title: "Product added successfully",
+            title: "Error adding product",
+            description: error.message,
+            variant: "destructive"
           });
-        }
-      })
-      .catch(error => {
-        toast({
-          title: "Error adding product",
-          description: error.message,
-          variant: "destructive"
         });
-      });
     }
   }
 
@@ -183,6 +184,7 @@ function AdminProducts() {
   // Add this useEffect to update formData when uploadedImageUrl changes
   useEffect(() => {
     if (uploadedImageUrl) {
+      console.log("Setting image URL in form data:", uploadedImageUrl);
       setFormData(prev => ({
         ...prev,
         image: uploadedImageUrl

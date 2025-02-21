@@ -5,34 +5,61 @@ const multer = require('multer');
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+}).single('my_file');
 
 const handleImageUpload = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No file uploaded"
+    // Use multer as middleware
+    upload(req, res, async (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        return res.status(400).json({
+          success: false,
+          message: err.message
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No file uploaded"
+        });
+      }
+
+      console.log("Received file:", {
+        fieldname: req.file.fieldname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
       });
-    }
 
-    console.log("Received file:", req.file); // Debug log
+      try {
+        const result = await imageUploadUtil(req.file);
+        console.log("Upload successful, result:", result);
 
-    const result = await imageUploadUtil(req.file);
-    
-    console.log("Cloudinary result:", result); // Debug log
-
-    res.status(200).json({
-      success: true,
-      imageUrl: result.secure_url,
-      message: "Image uploaded successfully"
+        res.status(200).json({
+          success: true,
+          imageUrl: result.secure_url,
+          message: "Image uploaded successfully"
+        });
+      } catch (uploadError) {
+        console.error("Upload error:", uploadError);
+        res.status(500).json({
+          success: false,
+          message: "Error uploading to Cloudinary",
+          error: uploadError.message
+        });
+      }
     });
-
   } catch (error) {
-    console.error("Error in handleImageUpload:", error);
+    console.error("Handler error:", error);
     res.status(500).json({
       success: false,
-      message: "Error uploading image",
+      message: "Server error during upload",
       error: error.message
     });
   }
