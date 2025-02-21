@@ -7,19 +7,19 @@ const initialState = {
 };
 
 export const addNewProduct = createAsyncThunk(
-  "/products/addnewproduct",
+  "/admin/products/add",
   async (formData) => {
-    const result = await axios.post(
+    const response = await axios.post(
       "https://clothing-store-ta8c.onrender.com/api/admin/products/add",
       formData,
       {
+        withCredentials: true,
         headers: {
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       }
     );
-
-    return result?.data;
+    return response.data;
   }
 );
 

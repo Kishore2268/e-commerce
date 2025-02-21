@@ -1,21 +1,29 @@
 const { imageUploadUtil } = require("../../helpers/cloudinary");
 const Product = require("../../models/Product");
+const { authMiddleware } = require("../auth/auth-controller");
 
 const handleImageUpload = async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded"
+      });
+    }
+
     const b64 = Buffer.from(req.file.buffer).toString("base64");
     const url = "data:" + req.file.mimetype + ";base64," + b64;
     const result = await imageUploadUtil(url);
 
-    res.json({
+    res.status(200).json({
       success: true,
-      result,
+      imageUrl: result
     });
   } catch (error) {
-    console.log(error);
-    res.json({
+    console.error("Error uploading image:", error);
+    res.status(500).json({
       success: false,
-      message: "Error occurred",
+      message: "Error uploading image"
     });
   }
 };
@@ -23,46 +31,63 @@ const handleImageUpload = async (req, res) => {
 //add a new product
 const addProduct = async (req, res) => {
   try {
-    const {
-      image,
-      title,
-      description,
-      category,
-      subCategory,
-      brand,
-      price,
-      salePrice,
-      sizes,
-      colors,
-      averageReview,
-    } = req.body;
+    const productData = req.body;
+    
+    // Format the data
+    const formattedProduct = {
+      ...productData,
+      // Convert price and salePrice to numbers
+      price: Number(productData.price),
+      salePrice: productData.salePrice ? Number(productData.salePrice) : undefined,
+      // Ensure colors is an array
+      colors: Array.isArray(productData.colors) ? productData.colors : [],
+      sizes: {
+        clothing: [],
+        footwear: []
+      }
+    };
 
-    console.log(averageReview, "averageReview");
+    // Handle sizes based on category
+    if (productData.category === "clothing" && productData.sizes?.clothing) {
+      formattedProduct.sizes.clothing = productData.sizes.clothing.map(item => ({
+        size: item.size.toString().toLowerCase(),
+        stock: Number(item.stock) || 0
+      }));
+    } else if (productData.category === "footwear" && productData.sizes?.footwear) {
+      formattedProduct.sizes.footwear = productData.sizes.footwear.map(item => ({
+        size: item.size.toString().toLowerCase(),
+        stock: Number(item.stock) || 0
+      }));
+    }
 
-    const newlyCreatedProduct = new Product({
-      image,
-      title,
-      description,
-      category,
-      subCategory,
-      brand,
-      price,
-      salePrice,
-      sizes: category === "footwear" ? { footwear: sizes } : { clothing: sizes },
-      colors,
-      averageReview,
-    });
+    // Calculate total stock
+    formattedProduct.totalStock = productData.category === "accessories" 
+      ? Number(productData.stock) || 0
+      : formattedProduct.sizes[productData.category].reduce((sum, item) => sum + (Number(item.stock) || 0), 0);
 
-    await newlyCreatedProduct.save();
-    res.status(201).json({
+    // Validate required fields
+    if (!formattedProduct.title || !formattedProduct.description || !formattedProduct.category) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields"
+      });
+    }
+
+    // Create and save the product
+    const newProduct = new Product(formattedProduct);
+    const savedProduct = await newProduct.save();
+
+    res.status(200).json({
       success: true,
-      data: newlyCreatedProduct,
+      message: "Product added successfully",
+      data: savedProduct
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error("Error adding product:", error);
     res.status(500).json({
       success: false,
-      message: "Error occurred",
+      message: "Error adding product",
+      error: error.message
     });
   }
 };

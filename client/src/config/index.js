@@ -1,3 +1,18 @@
+export const colors = [
+  { id: "black", label: "Black" },
+  { id: "white", label: "White" },
+  { id: "red", label: "Red" },
+  { id: "blue", label: "Blue" },
+  { id: "green", label: "Green" },
+  { id: "yellow", label: "Yellow" },
+  { id: "pink", label: "Pink" },
+  { id: "purple", label: "Purple" },
+  { id: "orange", label: "Orange" },
+  { id: "grey", label: "Grey" },
+  { id: "brown", label: "Brown" },
+  { id: "navy", label: "Navy" },
+];
+
 export const registerFormControls = [
   {
     name: "userName",
@@ -128,6 +143,16 @@ export const addProductFormElements = [
     type: "number",
     placeholder: "Enter sale price (optional)",
   },
+  {
+    label: "Colors",
+    name: "colors",
+    componentType: "multiselect",
+    options: colors.map(color => ({
+      id: color.id,
+      label: color.label
+    })),
+    placeholder: "Select colors",
+  },
 ];
 
 export const shoppingViewHeaderMenuItems = [
@@ -179,21 +204,6 @@ export const brandOptionsMap = {
   zara: "Zara",
   "h&m": "H&M",
 };
-
-export const colors = [
-  { id: "black", label: "Black" },
-  { id: "white", label: "White" },
-  { id: "red", label: "Red" },
-  { id: "blue", label: "Blue" },
-  { id: "green", label: "Green" },
-  { id: "yellow", label: "Yellow" },
-  { id: "pink", label: "Pink" },
-  { id: "purple", label: "Purple" },
-  { id: "orange", label: "Orange" },
-  { id: "grey", label: "Grey" },
-  { id: "brown", label: "Brown" },
-  { id: "navy", label: "Navy" },
-];
 
 export const filterOptions = {
   category: [

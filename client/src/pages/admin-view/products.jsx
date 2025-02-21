@@ -102,8 +102,18 @@ function AdminProducts() {
   function onSubmit(event) {
     event.preventDefault();
     
+    // Check if image is uploaded
+    if (!uploadedImageUrl && !currentEditedId) {
+      toast({
+        title: "Please upload an image",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const submitData = {
       ...formData,
+      image: uploadedImageUrl, // Add the uploaded image URL
       ...(formData.category === "accessories" && { stock: formData.totalStock })
     };
 
@@ -113,30 +123,40 @@ function AdminProducts() {
         formData: submitData,
       }))
       .then((data) => {
-        console.log(data, "edit");
-
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
           setFormData(initialFormData);
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
+          setUploadedImageUrl(""); // Reset image URL
         }
       });
     } else {
-      dispatch(addNewProduct({
-        ...submitData,
-        image: uploadedImageUrl,
-      }))
+      dispatch(addNewProduct(submitData))
       .then((data) => {
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
           setOpenCreateProductsDialog(false);
           setImageFile(null);
+          setUploadedImageUrl(""); // Reset image URL
           setFormData(initialFormData);
           toast({
             title: "Product added successfully",
           });
+        } else {
+          toast({
+            title: "Failed to add product",
+            description: data?.payload?.message || "Unknown error occurred",
+            variant: "destructive"
+          });
         }
+      })
+      .catch(error => {
+        toast({
+          title: "Error adding product",
+          description: error.message,
+          variant: "destructive"
+        });
       });
     }
   }
@@ -152,7 +172,12 @@ function AdminProducts() {
   function isFormValid() {
     return Object.keys(formData)
       .filter((currentKey) => currentKey !== "averageReview")
-      .map((key) => formData[key] !== "")
+      .map((key) => {
+        if (key === "image") {
+          return currentEditedId !== null || uploadedImageUrl !== "";
+        }
+        return formData[key] !== "";
+      })
       .every((item) => item);
   }
 

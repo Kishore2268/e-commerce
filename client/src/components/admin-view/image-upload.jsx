@@ -21,12 +21,36 @@ function ProductImageUpload({
 
   console.log(isEditMode, "isEditMode");
 
-  function handleImageFileChange(event) {
-    console.log(event.target.files, "event.target.files");
-    const selectedFile = event.target.files?.[0];
-    console.log(selectedFile);
+  async function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageLoadingState(true);
 
-    if (selectedFile) setImageFile(selectedFile);
+      const formData = new FormData();
+      formData.append("my_file", file);
+
+      try {
+        const response = await axios.post(
+          "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true
+          }
+        );
+
+        if (response.data.success) {
+          setUploadedImageUrl(response.data.imageUrl);
+          setImageLoadingState(false);
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        setImageLoadingState(false);
+      }
+    }
   }
 
   function handleDragOver(event) {
@@ -46,26 +70,6 @@ function ProductImageUpload({
     }
   }
 
-  async function uploadImageToCloudinary() {
-    setImageLoadingState(true);
-    const data = new FormData();
-    data.append("my_file", imageFile);
-    const response = await axios.post(
-      "https://clothing-store-ta8c.onrender.com/api/admin/products/upload-image",
-      data
-    );
-    console.log(response, "response");
-
-    if (response?.data?.success) {
-      setUploadedImageUrl(response.data.result.url);
-      setImageLoadingState(false);
-    }
-  }
-
-  useEffect(() => {
-    if (imageFile !== null) uploadImageToCloudinary();
-  }, [imageFile]);
-
   return (
     <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>
       <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
@@ -81,7 +85,8 @@ function ProductImageUpload({
           type="file"
           className="hidden"
           ref={inputRef}
-          onChange={handleImageFileChange}
+          onChange={handleImageUpload}
+          accept="image/*"
           disabled={isEditMode}
         />
         {!imageFile ? (
