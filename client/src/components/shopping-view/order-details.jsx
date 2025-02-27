@@ -18,7 +18,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Date</p>
-            <Label>{orderDetails?.orderDate?.split("T")[0]}</Label>
+            <Label>{orderDetails?.orderDate.split("T")[0]}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
@@ -54,18 +54,15 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           <div className="grid gap-2">
             <div className="font-medium">Order Details</div>
             <ul className="grid gap-3">
-              {orderDetails?.cartItems?.length > 0
-                ? orderDetails.cartItems.map((item, index) => (
-                    <li key={item.id || index} className="grid gap-1">
-                      <div className="flex items-center justify-between font-medium">
-                        <span>{item.title}</span>
-                        <span>${item.price}</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        <div>Quantity: {item.quantity}</div>
-                        {item.size && <div>Size: {item.size.toUpperCase()}</div>}
-                        {item.color && <div>Color: {item.color}</div>}
-                      </div>
+              {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
+                ? orderDetails?.cartItems.map((item, index) => (
+                    <li
+                      key={item.id || index}
+                      className="flex items-center justify-between"
+                    >
+                      <span>Title: {item.title}</span>
+                      <span>Quantity: {item.quantity}</span>
+                      <span>Price: ${item.price}</span>
                     </li>
                   ))
                 : null}
@@ -76,7 +73,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           <div className="grid gap-2">
             <div className="font-medium">Shipping Info</div>
             <div className="grid gap-0.5 text-muted-foreground">
-              <span>{user?.userName}</span>
+              <span>{user.userName}</span>
               <span>{orderDetails?.addressInfo?.address}</span>
               <span>{orderDetails?.addressInfo?.city}</span>
               <span>{orderDetails?.addressInfo?.pincode}</span>
@@ -89,7 +86,6 @@ function ShoppingOrderDetailsView({ orderDetails }) {
     </DialogContent>
   );
 }
-
 // ✅ **Prop Validation**
 ShoppingOrderDetailsView.propTypes = {
   orderDetails: PropTypes.shape({

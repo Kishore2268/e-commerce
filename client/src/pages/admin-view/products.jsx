@@ -9,7 +9,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
-import { addProductFormElements, clothingSizes, footwearSizes } from "@/config";
+import { addProductFormElements } from "@/config";
 import {
   addNewProduct,
   deleteProduct,
@@ -18,24 +18,16 @@ import {
 } from "@/store/admin/products-slice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 const initialFormData = {
   image: null,
   title: "",
   description: "",
   category: "",
-  subCategory: "",
   brand: "",
   price: "",
   salePrice: "",
-  sizes: {
-    clothing: [],
-    footwear: [],
-  },
-  stock: 0,
-  colors: [],
+  totalStock: "",
   averageReview: 0,
 };
 
@@ -47,98 +39,46 @@ function AdminProducts() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
-  const [sizeStockInputs, setSizeStockInputs] = useState([]);
 
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  function handleCategoryChange(category) {
-    setFormData(prev => ({
-      ...prev,
-      category,
-      subCategory: "", // Reset subcategory when category changes
-      sizes: {
-        clothing: [],
-        footwear: [],
-      },
-      stock: 0,
-    }));
-
-    // Set up size inputs based on category
-    if (category === "clothing") {
-      setSizeStockInputs(clothingSizes.map(size => ({
-        size: size.id,
-        stock: 0
-      })));
-    } else if (category === "footwear") {
-      setSizeStockInputs(footwearSizes.map(size => ({
-        size: size.id,
-        stock: 0
-      })));
-    } else {
-      setSizeStockInputs([]);
-    }
-  }
-
-  function handleSizeStockChange(sizeId, stock) {
-    const newSizeStockInputs = sizeStockInputs.map(item =>
-      item.size === sizeId ? { ...item, stock: parseInt(stock) || 0 } : item
-    );
-    setSizeStockInputs(newSizeStockInputs);
-
-    // Update formData with new sizes
-    const category = formData.category;
-    setFormData(prev => ({
-      ...prev,
-      sizes: {
-        ...prev.sizes,
-        [category]: newSizeStockInputs
-      },
-      totalStock: newSizeStockInputs.reduce((sum, item) => sum + item.stock, 0)
-    }));
-  }
-
   function onSubmit(event) {
     event.preventDefault();
-    
-    const submitData = {
-      ...formData,
-      ...(formData.category === "accessories" && { stock: formData.totalStock })
-    };
 
-    if (currentEditedId !== null) {
-      dispatch(editProduct({
-        id: currentEditedId,
-        formData: submitData,
-      }))
-      .then((data) => {
-        console.log(data, "edit");
+    currentEditedId !== null
+      ? dispatch(
+          editProduct({
+            id: currentEditedId,
+            formData,
+          })
+        ).then((data) => {
+          console.log(data, "edit");
 
-        if (data?.payload?.success) {
-          dispatch(fetchAllProducts());
-          setFormData(initialFormData);
-          setOpenCreateProductsDialog(false);
-          setCurrentEditedId(null);
-        }
-      });
-    } else {
-      dispatch(addNewProduct({
-        ...submitData,
-        image: uploadedImageUrl,
-      }))
-      .then((data) => {
-        if (data?.payload?.success) {
-          dispatch(fetchAllProducts());
-          setOpenCreateProductsDialog(false);
-          setImageFile(null);
-          setFormData(initialFormData);
-          toast({
-            title: "Product added successfully",
-          });
-        }
-      });
-    }
+          if (data?.payload?.success) {
+            dispatch(fetchAllProducts());
+            setFormData(initialFormData);
+            setOpenCreateProductsDialog(false);
+            setCurrentEditedId(null);
+          }
+        })
+      : dispatch(
+          addNewProduct({
+            ...formData,
+            image: uploadedImageUrl,
+          })
+        ).then((data) => {
+          if (data?.payload?.success) {
+            dispatch(fetchAllProducts());
+            setOpenCreateProductsDialog(false);
+            setImageFile(null);
+            setFormData(initialFormData);
+            toast({
+              title: "Product add successfully",
+            });
+          }
+        });
   }
 
   function handleDelete(getCurrentProductId) {
@@ -162,38 +102,6 @@ function AdminProducts() {
 
   console.log(formData, "productList");
 
-  // Render size/stock inputs based on category
-  const renderSizeStockInputs = () => {
-    if (formData.category === "accessories") {
-      return (
-        <div className="grid w-full gap-1.5">
-          <Label>Stock</Label>
-          <Input
-            type="number"
-            value={formData.stock}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              stock: parseInt(e.target.value) || 0,
-              totalStock: parseInt(e.target.value) || 0
-            }))}
-          />
-        </div>
-      );
-    }
-
-    return sizeStockInputs.map(({ size, stock }) => (
-      <div key={size} className="grid grid-cols-2 gap-2">
-        <div className="text-sm">{size.toUpperCase()}</div>
-        <Input
-          type="number"
-          value={stock}
-          onChange={(e) => handleSizeStockChange(size, e.target.value)}
-          placeholder="Stock"
-        />
-      </div>
-    ));
-  };
-
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
@@ -205,7 +113,7 @@ function AdminProducts() {
         {productList && productList.length > 0
           ? productList.map((productItem) => (
               <AdminProductTile
-                key={productItem.id || productItem._id} // Ensure a unique key
+                key={productItem.id || productItem._id} // Add a unique key here
                 setFormData={setFormData}
                 setOpenCreateProductsDialog={setOpenCreateProductsDialog}
                 setCurrentEditedId={setCurrentEditedId}
@@ -240,29 +148,13 @@ function AdminProducts() {
           />
           <div className="py-6">
             <CommonForm
+              onSubmit={onSubmit}
               formData={formData}
               setFormData={setFormData}
+              buttonText={currentEditedId !== null ? "Edit" : "Add"}
               formControls={addProductFormElements}
-              onCategoryChange={handleCategoryChange}
-              hideSubmitButton={true}
+              isBtnDisabled={!isFormValid()}
             />
-          </div>
-          {formData.category && (
-            <div className="mt-4">
-              <Label>Size & Stock Management</Label>
-              <div className="grid gap-2 mt-2">
-                {renderSizeStockInputs()}
-              </div>
-            </div>
-          )}
-          <div className="mt-6">
-            <Button
-              onClick={onSubmit}
-              disabled={!isFormValid()}
-              className="w-full"
-            >
-              {currentEditedId !== null ? "Edit Product" : "Add Product"}
-            </Button>
           </div>
         </SheetContent>
       </Sheet>

@@ -78,7 +78,6 @@ const AdminProductsSlice = createSlice({
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.productList = [];
-        console.error("Error fetching products:", action.error.message);
       });
   },
 });

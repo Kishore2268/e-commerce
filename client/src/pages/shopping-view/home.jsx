@@ -4,11 +4,18 @@ import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
 import {
   Airplay,
-  Shirt,
-  ShoppingBasket,
-  UmbrellaIcon,
+  BabyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CloudLightning,
+  Heater,
+  Images,
+  Shirt,
+  ShirtIcon,
+  ShoppingBasket,
+  UmbrellaIcon,
+  WashingMachine,
+  WatchIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -27,18 +34,20 @@ import { getFeatureImages } from "@/store/common-slice";
 const slides = [bannerOne, bannerTwo, bannerThree];
 
 const categoriesWithIcon = [
-  { id: "clothing", label: "Clothing", icon: Shirt },
+  { id: "men", label: "Men", icon: ShirtIcon },
+  { id: "women", label: "Women", icon: CloudLightning },
+  { id: "kids", label: "Kids", icon: BabyIcon },
+  { id: "accessories", label: "Accessories", icon: WatchIcon },
   { id: "footwear", label: "Footwear", icon: UmbrellaIcon },
-  { id: "accessories", label: "Accessories", icon: ShoppingBasket },
 ];
 
 const brandsWithIcon = [
-  { id: "nike", label: "Nike", icon: Airplay },
-  { id: "adidas", label: "Adidas", icon: Airplay },
-  { id: "puma", label: "Puma", icon: Airplay },
+  { id: "nike", label: "Nike", icon: Shirt },
+  { id: "adidas", label: "Adidas", icon: WashingMachine },
+  { id: "puma", label: "Puma", icon: ShoppingBasket },
   { id: "levi", label: "Levi's", icon: Airplay },
-  { id: "zara", label: "Zara", icon: Airplay },
-  { id: "h&m", label: "H&M", icon: Airplay },
+  { id: "zara", label: "Zara", icon: Images },
+  { id: "h&m", label: "H&M", icon: Heater },
 ];
 
 function ShoppingHome() {
@@ -161,7 +170,7 @@ function ShoppingHome() {
           <h2 className="text-3xl font-bold text-center mb-8">
             Shop by category
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {categoriesWithIcon.map((categoryItem, index) => (
               <Card
                 key={categoryItem.label || index} // Unique key

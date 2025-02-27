@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -15,10 +13,10 @@ const shopOrderRouter = require("./routes/shop/order-routes");
 const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
 
-// Import the wishlist routes
-const shopWishlistRouter = require("./routes/shop/wishlist-routes");
-
 const commonFeatureRouter = require("./routes/common/feature-routes");
+
+//create a database connection -> u can also
+//create a separate file for this and then import/use that file here
 
 mongoose
   .connect("mongodb+srv://kishore:KishSabi%402268@anivarti.cp7lj.mongodb.net/clothing-store")
@@ -26,13 +24,11 @@ mongoose
   .catch((error) => console.log(error));
 
 const app = express();
-const path = require("path");
-
 const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://clothing-ecommerc-store.onrender.com", "http://localhost:3000"],
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -47,7 +43,6 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
-
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
@@ -59,24 +54,6 @@ app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
 
-// Add the wishlist routes
-app.use("/api/shop/wishlist", shopWishlistRouter);
-
 app.use("/api/common/feature", commonFeatureRouter);
 
-// Serve static files from Vite build
-app.use(express.static(path.join(__dirname, "dist")));
-
-// Handle client-side routing properly
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
-});
-
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
-
-console.log('Environment Check:', {
-  NODE_ENV: process.env.NODE_ENV,
-  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? 'Present' : 'Missing',
-  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? 'Present' : 'Missing',
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? 'Present' : 'Missing'
-});
